@@ -87,7 +87,6 @@ LIMIT 10
 """
 
 df_states = pd.read_sql(query_states, conn)
-
 df_states["total_cr"] = df_states["total"] / 10000000
 
 fig_states = px.bar(
@@ -110,7 +109,7 @@ st.divider()
 
 # ---------------- BUSINESS CASES ---------------- #
 
-# 1 Transaction Dynamics
+# 1️⃣ Transaction Dynamics
 if menu == "Transaction Dynamics":
 
     st.header("📈 Transaction Trend Over Years")
@@ -123,7 +122,6 @@ if menu == "Transaction Dynamics":
     """
 
     df = pd.read_sql(query, conn)
-
     df["total_cr"] = df["total"] / 10000000
 
     fig = px.line(df, x="year", y="total_cr", markers=True)
@@ -135,7 +133,7 @@ if menu == "Transaction Dynamics":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 2 Device Dominance
+# 2️⃣ Device Dominance
 elif menu == "Device Dominance":
 
     st.header(f"📱 Top Mobile Brands — {year} Q{quarter}")
@@ -159,7 +157,7 @@ elif menu == "Device Dominance":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 3 Insurance Growth
+# 3️⃣ Insurance Growth
 elif menu == "Insurance Growth":
 
     st.header("🛡 Insurance Growth Over Years")
@@ -172,7 +170,6 @@ elif menu == "Insurance Growth":
     """
 
     df = pd.read_sql(query, conn)
-
     df["total_cr"] = df["total"] / 10000000
 
     fig = px.line(df, x="year", y="total_cr", markers=True)
@@ -184,7 +181,7 @@ elif menu == "Insurance Growth":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 4️ Market Expansion
+# 4️⃣ Market Expansion
 elif menu == "Market Expansion":
 
     st.header(f"🌍 Top District Transactions — {year} Q{quarter}")
@@ -199,7 +196,6 @@ elif menu == "Market Expansion":
     """
 
     df = pd.read_sql(query, conn)
-
     df["total_cr"] = df["total"] / 10000000
 
     fig = px.bar(
@@ -218,7 +214,7 @@ elif menu == "Market Expansion":
 
     st.plotly_chart(fig, use_container_width=True)
 
-# 5️ User Growth
+# 5️⃣ User Growth
 elif menu == "User Growth":
 
     st.header(f"👥 Top Pincodes by Registered Users — {year} Q{quarter}")
@@ -234,18 +230,27 @@ elif menu == "User Growth":
 
     df = pd.read_sql(query, conn)
 
+    # Convert pincode to string for proper display
+    df["pincode"] = df["pincode"].astype(str)
+
     fig = px.bar(
         df,
         x="pincode",
         y="users",
         color="users",
-        color_continuous_scale="Oranges"
+        color_continuous_scale="Oranges",
+        text="users",
+        title=f"Top Pincodes by Registered Users - {year} Q{quarter}"
     )
 
     fig.update_layout(
         xaxis_title="Pincode",
-        yaxis_title="Total Users"
+        yaxis_title="Total Registered Users",
+        xaxis=dict(type="category"),
+        title_x=0.35
     )
+
+    fig.update_traces(textposition="outside")
 
     st.plotly_chart(fig, use_container_width=True)
 
