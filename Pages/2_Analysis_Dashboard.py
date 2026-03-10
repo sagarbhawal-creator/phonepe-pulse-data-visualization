@@ -13,6 +13,8 @@ conn = get_connection()
 
 # ---------------- SIDEBAR FILTERS ---------------- #
 
+st.sidebar.title("📊 PhonePe Insights")   # ⭐ Pro Tip added
+
 st.sidebar.header("Filters")
 
 year = st.sidebar.selectbox(
@@ -73,40 +75,6 @@ col3.metric("🛡 Total Insurance", f"₹ {insurance_cr:,.0f} Cr")
 
 st.divider()
 
-# ---------------- TOP STATES CHART ---------------- #
-
-st.subheader(f"🏆 Top States by Transactions — {year} Q{quarter}")
-
-query_states = f"""
-SELECT state, SUM(transaction_amount) AS total
-FROM aggregated_transactions
-WHERE year={year} AND quarter={quarter}
-GROUP BY state
-ORDER BY total DESC
-LIMIT 10
-"""
-
-df_states = pd.read_sql(query_states, conn)
-df_states["total_cr"] = df_states["total"] / 10000000
-
-fig_states = px.bar(
-    df_states,
-    x="state",
-    y="total_cr",
-    color="total_cr",
-    color_continuous_scale="Purples"
-)
-
-fig_states.update_layout(
-    xaxis_title="State",
-    yaxis_title="Transaction Amount (₹ Cr)",
-    xaxis_tickangle=-45
-)
-
-st.plotly_chart(fig_states, use_container_width=True)
-
-st.divider()
-
 # ---------------- BUSINESS CASES ---------------- #
 
 # 1️⃣ Transaction Dynamics
@@ -132,6 +100,37 @@ if menu == "Transaction Dynamics":
     )
 
     st.plotly_chart(fig, use_container_width=True)
+
+    # ⭐ Top States Chart moved here
+    st.subheader(f"🏆 Top States by Transactions — {year} Q{quarter}")
+
+    query_states = f"""
+    SELECT state, SUM(transaction_amount) AS total
+    FROM aggregated_transactions
+    WHERE year={year} AND quarter={quarter}
+    GROUP BY state
+    ORDER BY total DESC
+    LIMIT 10
+    """
+
+    df_states = pd.read_sql(query_states, conn)
+    df_states["total_cr"] = df_states["total"] / 10000000
+
+    fig_states = px.bar(
+        df_states,
+        x="state",
+        y="total_cr",
+        color="total_cr",
+        color_continuous_scale="Purples"
+    )
+
+    fig_states.update_layout(
+        xaxis_title="State",
+        yaxis_title="Transaction Amount (₹ Cr)",
+        xaxis_tickangle=-45
+    )
+
+    st.plotly_chart(fig_states, use_container_width=True)
 
 # 2️⃣ Device Dominance
 elif menu == "Device Dominance":
@@ -229,8 +228,6 @@ elif menu == "User Growth":
     """
 
     df = pd.read_sql(query, conn)
-
-    # Convert pincode to string for proper display
     df["pincode"] = df["pincode"].astype(str)
 
     fig = px.bar(
@@ -239,15 +236,13 @@ elif menu == "User Growth":
         y="users",
         color="users",
         color_continuous_scale="Oranges",
-        text="users",
-        title=f"Top Pincodes by Registered Users - {year} Q{quarter}"
+        text="users"
     )
 
     fig.update_layout(
         xaxis_title="Pincode",
         yaxis_title="Total Registered Users",
-        xaxis=dict(type="category"),
-        title_x=0.35
+        xaxis=dict(type="category")
     )
 
     fig.update_traces(textposition="outside")
